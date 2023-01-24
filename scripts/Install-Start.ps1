@@ -1,21 +1,18 @@
-#Variable
-$TempFolder = [System.IO.Path]::GetTempPath()
-$FolderPath = Join-Path $TempFolder "ExchangeInstall"
- 
-#Check if Folder exists
-If(!(Test-Path -Path $FolderPath))
-{
-    New-Item -ItemType Directory -Path $FolderPath
-    Write-Host "New folder $FolderPath created successfully!" -f Green
+try { 
+    $TempFolder = "C:\"
+    $FolderPath = Join-Path $TempFolder "ExchangeInstall"
+    
+    Start-Transcript -Path "$FolderPath\log\Install-Start.ps1.txt" -Append
+
+    $joinDomainFileURL  = "https://raw.githubusercontent.com/jaricardodev/quickstart-microsoft-exchange/main/scripts/Join-Domain.ps1"
+
+    $Path = "$FolderPath\Join-Domain.ps1"
+
+    Invoke-WebRequest -URI $joinDomainFileURL -OutFile $Path
+
+    stop-transcript|out-null
 }
-Else
-{
-  Write-Host "Folder already exists!" -f Yellow
+catch {
+    Write-Verbose "$($_.exception.message)@ $(Get-Date)"
+    stop-transcript|out-null
 }
-
-
-$joinURL  = "https://raw.githubusercontent.com/jaricardodev/quickstart-microsoft-exchange/main/scripts/Join-Domain.ps1"
-
-$Path = "$FolderPath\Join-Domain.ps1"
-
-Invoke-WebRequest -URI $URL -OutFile $Path
